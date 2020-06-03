@@ -9,7 +9,6 @@ using Domain.Domains;
 using Infra.Data.RepositoryInterfaces;
 using Microsoft.Extensions.Caching.Distributed;
 using Repository.Interfaces;
-using MongoDB.Driver;
 using ProductApp.UseCasesInterfaces.GetProducts;
 using ServiceStack.Script;
 using Shared;
@@ -18,13 +17,11 @@ namespace ProductApp.UseCases.GetProducts
 {
     public class GetProducts : IGetProducts
     {
-        private readonly IProductRepository _productRepository;
-        private readonly IDistributedCache _distributedCache;
+        private readonly IUnitOfWorkDapper _uow;
 
-        public GetProducts(IProductRepository productRepository, IDistributedCache distributedCache = null)
+        public GetProducts(IUnitOfWorkDapper uow)
         {
-            _productRepository = productRepository;
-            _distributedCache = distributedCache;
+            _uow = uow;
         }
         
         public async Task<IGetProductsResponseObject> Handle(IGetProductsRequestObject requestObject)
@@ -42,8 +39,8 @@ namespace ProductApp.UseCases.GetProducts
 
                 if (String.IsNullOrWhiteSpace(requestObject.Field))
                 {
-                    totalProducts = await _productRepository.Count();
-                    products = await _productRepository.GetAll(requestObject.Skip, requestObject.Limit, "Description");
+                    products = await _uow.ProductRepository.Query();
+                    totalProducts = products.Count();
                 }
                 else
                 {
@@ -52,14 +49,22 @@ namespace ProductApp.UseCases.GetProducts
                     if (fieldProperties == null)
                         return new GetProductsResponseObject((int)HttpStatusCode.BadRequest, new ValidationNotification(Messages.ProductSearchFieldError, requestObject.Field));
 
-                    products = 
-                        await _productRepository.GetByFilterLike(fieldProperties.Name,requestObject.Search,requestObject.Skip, requestObject.Limit, fieldProperties.Name);
+                    if (Decimal.TryParse(requestObject.Search, out _))
+                    {
+                        products = 
+                            await _uow.ProductRepository.Query(fieldProperties.Name + " = @queryValue" ,new {queryValue = requestObject.Search});
+                    }
+                    else
+                    {
+                        products = 
+                            await _uow.ProductRepository.Query(fieldProperties.Name + " like @queryValue" ,new {queryValue = "%" + requestObject.Search + "%"});
+                    }
+                       
 
-                    totalProducts =
-                        await _productRepository.CountByFilterLike(fieldProperties.Name,requestObject.Search);
+                    totalProducts = products.Count();
                 }
 
-                return new GetProductsResponseObject(products, requestObject.Skip, requestObject.Limit, totalProducts);
+                return new GetProductsResponseObject(products, totalProducts);
             }
             catch (Exception e)
             {

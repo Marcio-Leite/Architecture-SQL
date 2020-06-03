@@ -1,9 +1,11 @@
 using DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Repository.Persistence;
 
 
 namespace ProductService
@@ -20,6 +22,9 @@ namespace ProductService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<PersistenceDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddControllers();
             services.AddMvc().AddRazorPagesOptions(options =>
             {
@@ -30,6 +35,8 @@ namespace ProductService
             AddStartup.AddProductDependencyInjection(services);
             AddStartup.AddSwaggerAndDependencies(services,"Products Service", "v1", "Products Service for usage example of architecture", Configuration);
             AddSecurity.AddBearerTokens(services);
+            
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

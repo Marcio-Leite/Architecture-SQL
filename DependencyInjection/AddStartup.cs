@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -14,13 +15,14 @@ using ProductApp.UseCasesInterfaces.DeleteProduct;
 using ProductApp.UseCasesInterfaces.GetProducts;
 using ProductApp.UseCasesInterfaces.UpdateProduct;
 using Repository.Interfaces;
+using Repository.Persistence;
 using Repository.UnitOfWork;
 
 namespace DependencyInjection
 {
     public static class AddStartup
     {
-
+ 
         public static void AddProductDependencyInjection(IServiceCollection services)
         {
             services.AddTransient<IAddProduct, AddProduct>();
@@ -28,8 +30,7 @@ namespace DependencyInjection
             services.AddTransient<IUpdateProduct, UpdateProduct>();
             services.AddTransient<IDeleteProduct, DeleteProduct>();
             services.AddTransient<IProductService, ProductApp.Service.ProductService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUnitOfWorkDapper, UnitOfWorkDapper>();
         }
         
         public static void AddSwaggerAndSecurityToApp(IApplicationBuilder app)

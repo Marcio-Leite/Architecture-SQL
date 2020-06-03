@@ -7,17 +7,16 @@ using Repository.Interfaces;
 using ProductApp.UseCases.AddProduct;
 using ProductApp.UseCasesInterfaces.UpdateProduct;
 using Shared;
+using IProductRepository = Infra.Data.RepositoryInterfaces.IProductRepository;
 
 namespace ProductApp.UseCases.UpdateProduct
 {
     public class UpdateProduct : IUpdateProduct
     {
-        private readonly IProductRepository _productRepository;
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWorkDapper _uow;
 
-        public UpdateProduct(IProductRepository productRepository, IUnitOfWork uow)
+        public UpdateProduct(IUnitOfWorkDapper uow)
         {
-            _productRepository = productRepository;
             _uow = uow;
         }
         
@@ -42,9 +41,9 @@ namespace ProductApp.UseCases.UpdateProduct
                 
                 Product product = new Product(requestObject.ProductId, requestObject.Description, requestObject.Price); 
                 
-                _productRepository.Update(product);
+                _uow.ProductRepository.Update(product);
 
-                if (! await _uow.Commit())
+                if (!_uow.Commit())
                     return new UpdateProductResponseObject((int) HttpStatusCode.InternalServerError, new ValidationNotification(Messages.DatabaseError)); 
                 
                 return new UpdateProductResponseObject(product);
@@ -57,13 +56,13 @@ namespace ProductApp.UseCases.UpdateProduct
 
         private async Task<bool> CheckIfProductExists(Guid requestObjectProductId)
         {
-            var product = await _productRepository.GetById(requestObjectProductId);
+            var product = await _uow.ProductRepository.GetById(requestObjectProductId);
             return product != null;
         }
         
         private async Task<bool> DescriptionExists(string description)
         {
-            return await _productRepository.CheckIfProductExistsByDescription(description);
+            return await _uow.ProductRepository.CheckIfProductExistsByDescription(description);
         }
     }
 }

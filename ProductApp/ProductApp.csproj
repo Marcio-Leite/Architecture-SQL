@@ -7,7 +7,6 @@
     <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
       <ProjectReference Include="..\Infra.Data\Infra.Data.csproj" />
-      <ProjectReference Include="..\ProductDbRepository\ProductDbRepository.csproj" />
       <ProjectReference Include="..\Repository\Repository.csproj" />
       <ProjectReference Include="..\Shared\Shared.csproj" />
     </ItemGroup>

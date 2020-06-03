@@ -8,23 +8,20 @@
       <PackageReference Include="Dapper" Version="2.0.35" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.4" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="2.0.0-preview1-final" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
       <PackageReference Include="ServiceStack.Core" Version="5.8.0" />
       <PackageReference Include="System.Linq.Dynamic.Core" Version="1.1.1" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Remove="Persistence\ClassMap.cs" />
-      <Compile Remove="Persistence\MongoDbPersistence.cs" />
+      <ProjectReference Include="..\Domain\Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BaseRepository\BaseRepository.csproj" />
-      <ProjectReference Include="..\Infra.Map\Infra.Map.csproj" />
+      <Reference Include="Infra.Map, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+        <HintPath>..\Infra.Map\bin\Debug\netcoreapp3.1\Infra.Map.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

@@ -21,9 +21,9 @@ namespace Services.Tests.Scenarios
         {
             // Arrange
 
-            _productTestContext.productRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(Task.FromResult(VALID_PRODUCT));
-            _productTestContext.productRepositoryMock.Setup(x => x.Update(It.IsAny<Product>()));
-            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns(Task.FromResult(true));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.GetById(It.IsAny<Guid>())).Returns(Task.FromResult(VALID_PRODUCT));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.Update(It.IsAny<Product>()));
+            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns((true));
 
             var request = new
             {

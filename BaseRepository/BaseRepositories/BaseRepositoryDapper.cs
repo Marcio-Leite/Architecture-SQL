@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Dapper;
-using IdentityServerSQL.UnitOfWork;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Protocols;
+using Repository.Interfaces;
 
-namespace IdentityServerSQL.Repository
+namespace Repository.Repository
 {
     public abstract class BaseRepositoryDapper<TEntity> : IRepository<TEntity> where TEntity : class
     {
@@ -30,7 +28,7 @@ namespace IdentityServerSQL.Repository
 
             Connection.Execute(query, entity, Transaction);
         }
-        
+
         public virtual void Delete(TEntity entity)
         {
             var query = $"delete from {typeof(TEntity).Name}s where Id = @Id";
@@ -59,7 +57,7 @@ namespace IdentityServerSQL.Repository
                 Transaction);
         }
         
-        public virtual async Task<TEntity> GetById(string id)
+        public virtual async Task<TEntity> GetById(Guid id)
         {
             var query = $"select * from {typeof(TEntity).Name}s where {typeof(TEntity).Name}Id = @id";
             

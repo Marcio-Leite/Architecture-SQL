@@ -20,9 +20,9 @@ namespace Services.Tests.Scenarios
         public async Task DeleteProductWithRightRequest_ReturnsOkResponse()
         {
             // Arrange
-            _productTestContext.productRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(Task.FromResult(VALID_PRODUCT));
-            _productTestContext.productRepositoryMock.Setup(x => x.Remove(It.IsAny<Guid>()));
-            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns(Task.FromResult(true));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.GetById(It.IsAny<Guid>())).Returns(Task.FromResult(VALID_PRODUCT));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.Delete(It.IsAny<Product>()));
+            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns((true));
             
             var request = new
             {
@@ -54,7 +54,7 @@ namespace Services.Tests.Scenarios
         public async Task DeleteProductWithWrongRequest_ReturnsNotFoundResponse()
         {
             // Arrange
-            _productTestContext.productRepositoryMock.Setup(x => x.GetById(It.IsAny<Guid>())).Returns(Task.FromResult((Product) null));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.GetById(It.IsAny<Guid>())).Returns(Task.FromResult((Product) null));
             
             var request = new
             {

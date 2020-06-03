@@ -14,16 +14,14 @@ namespace ProductService.Controllers
 {
     [Route("productsService")]
     [ApiController]
-    [Authorize(Roles="Admin,Product")]
+    [Authorize(Roles="Admin,Products")]
     public class ProductController : ControllerBase
     {
         private IProductService _productService;
-        private readonly IDistributedCache _distributedCache;
-        
-        public ProductController(IProductService productService, IDistributedCache distributedCache)
+
+        public ProductController(IProductService productService)
         {
             _productService = productService;
-            _distributedCache = distributedCache;
         }
         
         [HttpPost, Route("product")]
@@ -51,32 +49,11 @@ namespace ProductService.Controllers
         }
         
         [HttpGet, Route("products")]
-        public IActionResult GetProduct([FromQuery]int skip, [FromQuery]int limit, [FromQuery] string field, [FromQuery] string search)
+        public IActionResult GetProduct([FromQuery] string field = "", [FromQuery] string search = "")
         {
-            var result = _productService.Handle( new GetProductsRequestObject(skip,limit,field,search));
+            var result = _productService.Handle( new GetProductsRequestObject(field,search));
 
             return StatusCode(result.Result.StatusCode, result.Result);
-        }
-        
-        
-        /////
-        
-        [AllowAnonymous]
-        [HttpGet, Route("product/teste")]
-        public async Task<string> Get()
-        {
-            var cacheKey = "TheTime";
-            var existingTime = _distributedCache.GetString(cacheKey);
-            if (!string.IsNullOrEmpty(existingTime))
-            {
-                return "Fetched from cache : " + existingTime;
-            }
-            else
-            {
-                existingTime = DateTime.UtcNow.ToString();
-                _distributedCache.SetString(cacheKey, existingTime);
-                return "Added to cache : " + existingTime;
-            }
         }
     }
 }

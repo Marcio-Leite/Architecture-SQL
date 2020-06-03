@@ -13,12 +13,10 @@ namespace ProductApp.UseCases.DeleteProduct
 {
     public class DeleteProduct : IDeleteProduct
     {
-        private IProductRepository _productRepository;
-        private IUnitOfWork _unitOfWork;
+        private IUnitOfWorkDapper _unitOfWork;
         
-        public DeleteProduct(IProductRepository productRepository, IUnitOfWork unitOfWork)
+        public DeleteProduct(IUnitOfWorkDapper unitOfWork)
         {
-            _productRepository = productRepository;
             _unitOfWork = unitOfWork;
         }
         
@@ -31,14 +29,15 @@ namespace ProductApp.UseCases.DeleteProduct
                 if (!deleteProductRequestObject.IsValid)
                     return new DeleteProductResponseObject((int) HttpStatusCode.BadRequest,
                         deleteProductRequestObject.ValidationNotifications);
-                
-                if (await _productRepository.GetById(deleteProductRequestObject.Id) == null)
+
+                var product = await _unitOfWork.ProductRepository.GetById(deleteProductRequestObject.Id);
+                if (product == null)
                     return new DeleteProductResponseObject((int) HttpStatusCode.NotFound,
                         new ValidationNotification(Messages.ProductIdError));
 
-                _productRepository.Remove(deleteProductRequestObject.Id);
+                _unitOfWork.ProductRepository.Delete(product);
 
-                if (!await _unitOfWork.Commit())
+                if (! _unitOfWork.Commit())
                     return new DeleteProductResponseObject((int) HttpStatusCode.InternalServerError,
                         new ValidationNotification(Messages.DatabaseError));
 

@@ -11,12 +11,10 @@ namespace ProductApp.UseCases.AddProduct
 {
     public class AddProduct : IAddProduct
     {
-        private readonly IProductRepository _productRepository;
-        private readonly IUnitOfWork _uow;
+        private readonly IUnitOfWorkDapper _uow;
 
-        public AddProduct(IProductRepository productRepository, IUnitOfWork uow)
+        public AddProduct( IUnitOfWorkDapper uow)
         {
-            _productRepository = productRepository;
             _uow = uow;
         }
 
@@ -36,9 +34,9 @@ namespace ProductApp.UseCases.AddProduct
 
                 var product = new Product(Guid.NewGuid(), requestObject.Description, requestObject.Price);
 
-                _productRepository.Add(product);
+                _uow.ProductRepository.Add(product);
 
-                if (!await _uow.Commit())
+                if (! _uow.Commit())
                     return new AddProductResponseObject((int) HttpStatusCode.InternalServerError,
                         new ValidationNotification(Messages.DatabaseError));
 
@@ -53,7 +51,7 @@ namespace ProductApp.UseCases.AddProduct
 
         private async Task<bool> DescriptionExists(string description)
         {
-            return await _productRepository.CheckIfProductExistsByDescription(description);
+            return await _uow.ProductRepository.CheckIfProductExistsByDescription(description);
         }
         
     }

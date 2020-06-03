@@ -1,21 +1,24 @@
 ﻿using System;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain.Domains
 {
     public class Product
     {
-        public Product(Guid id, string description, decimal price)
+        public Product()
         {
-            Id = id;
+
+        }
+        public Product(Guid productId, string description, decimal price)
+        {
+            ProductId = productId;
             Description = description;
             Price = price;
         }
         
-        public Guid Id { get; private set; }
+        public Guid ProductId { get; set; }
         
-        public string Description { get; private set; }
+        public string Description { get; set; }
 
-        public decimal Price { get; private set; }
+        public decimal Price { get; set; }
     }
 }

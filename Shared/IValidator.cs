@@ -7,7 +7,7 @@ namespace Shared
         List<ValidationNotification> ValidationNotifications { get; }
         bool IsValid { get; }
         void Validate();
-        int Skip { get; }
-        int Limit { get; }
+        // int Skip { get; }
+        // int Limit { get; }
     }
 }

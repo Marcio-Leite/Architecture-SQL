@@ -20,17 +20,13 @@ namespace ProductApp.UseCases.GetProducts
             this.StatusCode = statusCode;
             this.ValidationNotifications = new List<ValidationNotification> { validationNotification };
         }
-        public GetProductsResponseObject(IEnumerable<Product> products, int skip, int limit, long count)
+        public GetProductsResponseObject(IEnumerable<Product> products, long count)
         {
             StatusCode = (int) HttpStatusCode.OK;
-            ProductsResponse = products.Select(c => new ProductResponse(c.Id, c.Description, c.Price)).ToList();
-            Skip = skip;
-            Limit = limit;
+            ProductsResponse = products.Select(c => new ProductResponse(c.ProductId, c.Description, c.Price)).ToList();
             Count = count;
         }
-
-        public int Skip { get; }
-        public int Limit { get; }
+        
         public long Count { get; private set;}
         public IEnumerable<ValidationNotification> ValidationNotifications { get; }
         public int StatusCode { get; }

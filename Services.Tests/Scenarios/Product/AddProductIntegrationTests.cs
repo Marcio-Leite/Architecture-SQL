@@ -54,8 +54,8 @@ namespace Services.Tests.Scenarios
         public async Task AddProductWithRightRequest_ReturnsOkResponse()
         {
             // Arrange
-            _productTestContext.productRepositoryMock.Setup(x => x.Add(It.IsAny<Product>()));
-            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns(Task.FromResult(true));
+            _productTestContext.unitOfWorkMock.Setup(x => x.ProductRepository.Add(It.IsAny<Product>()));
+            _productTestContext.unitOfWorkMock.Setup(x => x.Commit()).Returns((true));
             
             var request = new
             {

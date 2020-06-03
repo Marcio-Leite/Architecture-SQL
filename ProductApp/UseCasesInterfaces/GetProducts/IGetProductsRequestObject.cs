@@ -1,6 +1,4 @@
-﻿using Domain.Domains;
-using MongoDB.Driver;
-using Shared;
+﻿using Shared;
 
 namespace ProductApp.UseCasesInterfaces.GetProducts
 {

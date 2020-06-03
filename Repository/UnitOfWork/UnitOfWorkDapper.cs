@@ -1,40 +1,22 @@
 ﻿using System;
 using System.Data;
 using System.Threading.Tasks;
-using IdentityServerSQL.Repository;
 using Microsoft.Data.SqlClient;
-namespace IdentityServerSQL.UnitOfWork
-{
-    public class UnitOfWork: IUnitOfWork
+using Repository.Interfaces;
+using Repository.Map;
+
+namespace Repository.UnitOfWork
+    {
+    public class UnitOfWorkDapper: UnitOfWorkDapperMapper, IUnitOfWorkDapper
     {
         private IDbConnection _connection;
-        private IDbTransaction _transaction;
-        
-        private IUserRoleRepository _userRoleRepository;
-        private IUserRepository _userRepository;
-        private IRoleRepository _roleRepository;
         private bool _disposed;
 
-        public UnitOfWork()
+        public UnitOfWorkDapper()
         {
             _connection = new SqlConnection( "Server=.\\SQLEXPRESS;Database=ArchitectureSQL;Trusted_Connection=True;User ID=marcioleite;Password=turambar;MultipleActiveResultSets=True"); 
             _connection.Open();
             _transaction = _connection.BeginTransaction();
-        }
-
-        public IUserRepository UserRepository
-        {
-            get { return _userRepository ?? (_userRepository = new UserRepository(_transaction)); }
-        }
-        
-        public IRoleRepository RoleRepository
-        {
-            get { return _roleRepository ?? (_roleRepository = new RoleRepository(_transaction)); }
-        }
-        
-        public IUserRoleRepository UserRoleRepository
-        {
-            get { return _userRoleRepository ??= new UserRoleRepository(_transaction); }
         }
 
         public bool Commit()
@@ -50,21 +32,12 @@ namespace IdentityServerSQL.UnitOfWork
                 var error = e.Message;
                 return false;
             }
-             finally
-             {
-                 _transaction.Dispose();
-                 _transaction = _connection.BeginTransaction();
-                 ResetRepositories();
-             }
-
-           //return changeAmount > 0;
-        }
-
-        private void ResetRepositories()
-        {
-            _userRepository = null;
-            _roleRepository = null;
-            _userRoleRepository = null;
+            finally
+            {
+                _transaction.Dispose();
+                _transaction = _connection.BeginTransaction();
+                ResetRepositories();
+            }
         }
 
         public void Dispose()
@@ -94,7 +67,7 @@ namespace IdentityServerSQL.UnitOfWork
             }
         }
 
-        ~UnitOfWork()
+        ~UnitOfWorkDapper()
         {
             dispose(false);
         }

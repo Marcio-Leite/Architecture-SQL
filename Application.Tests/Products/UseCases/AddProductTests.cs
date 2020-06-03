@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Infra.Data.RepositoryInterfaces;
-using MongoCoreDbRepository.Interfaces;
 using Moq;
 using NUnit.Framework;
 using ProductApp.Service;
 using ProductApp.UseCases.AddProduct;
 using ProductApp.UseCasesInterfaces.AddProduct;
+using Repository.Interfaces;
 using Shared;
+using IProductRepository = Infra.Data.RepositoryInterfaces.IProductRepository;
 
 namespace Application.Tests.Products.UseCases
 {
@@ -19,9 +19,9 @@ namespace Application.Tests.Products.UseCases
         private string VALID_DESCRIPTION = "Café Pilão 500g";
         private decimal VALID_PRICE = Convert.ToDecimal(10.50);
         private decimal INVALID_PRICE = 0;
-        private IProductService GetUseCase(IProductRepository productRepository = null, IUnitOfWork unitOfWork = null)
+        private IProductService GetUseCase(IUnitOfWorkDapper unitOfWork = null)
         {
-            return new ProductService(new AddProduct(productRepository,unitOfWork));
+            return new ProductService(new AddProduct(unitOfWork));
         } 
         
         private IAddProductRequestObject GetInvalidDescriptionRequestObject()
@@ -39,14 +39,14 @@ namespace Application.Tests.Products.UseCases
             return new AddProductRequestObject(VALID_DESCRIPTION, INVALID_PRICE);
         }
 
-        private Mock<IProductRepository> GetProductRepositoryMock()
+        private Mock<IUnitOfWorkDapper> GetProductRepositoryMock()
         {
-            return new Mock<IProductRepository>();
+            return new Mock<IUnitOfWorkDapper>();
         }
 
-        private Mock<IUnitOfWork> GetUowMock()
+        private Mock<IUnitOfWorkDapper> GetUowMock()
         {
-            return new Mock<IUnitOfWork>();
+            return new Mock<IUnitOfWorkDapper>();
         }
         
         [Test]
@@ -88,7 +88,7 @@ namespace Application.Tests.Products.UseCases
             // Arrange
             var repositoryMock = GetProductRepositoryMock();
             repositoryMock
-                .Setup(r => r.CheckIfProductExistsByDescription(It.IsAny<String>()))
+                .Setup(r => r.ProductRepository.CheckIfProductExistsByDescription(It.IsAny<String>()))
                 .Returns(Task.FromResult(true));
             var useCase = GetUseCase(repositoryMock.Object);
             var requestObject = GetValidRequestObject();
@@ -108,13 +108,13 @@ namespace Application.Tests.Products.UseCases
             // Arrange
             var repositoryMock = GetProductRepositoryMock();
             repositoryMock
-                .Setup(r => r.CheckIfProductExistsByDescription(It.IsAny<String>()))
+                .Setup(r => r.ProductRepository.CheckIfProductExistsByDescription(It.IsAny<String>()))
                 .Returns(Task.FromResult(false));
             
             var uowMock = GetUowMock();
-            uowMock.Setup(x => x.Commit()).Returns(Task.FromResult(true));
+            uowMock.Setup(x => x.Commit()).Returns((true));
             
-            var useCase = GetUseCase(repositoryMock.Object, uowMock.Object);
+            var useCase = GetUseCase(uowMock.Object);
             var requestObject = GetValidRequestObject();
 
             // Act

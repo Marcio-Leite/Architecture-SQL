@@ -14,7 +14,7 @@ namespace ProductApp.UseCases.UpdateProduct
         public UpdateProductResponseObject(Product product)
         {
             StatusCode = (int) HttpStatusCode.OK;
-            ProductResponse = new ProductResponse(product.Id, product.Description, product.Price);
+            ProductResponse = new ProductResponse(product.ProductId, product.Description, product.Price);
             ValidationNotifications = new List<ValidationNotification>();
         }
         
